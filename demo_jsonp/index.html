@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>GoJSONP</title>
+</head>
+
+<body>
+
+    <script type="text/javascript" src="./jquery-2.2.2.min.js"></script>
+    <script type="text/javascript">
+        function myJsonp(url, data, callback) {
+            // 随机生成函数的名字
+            var fnName = 'myJsonp_' + Math.random().toString().replace('.', '');
+            // 将生成的函数的名字挂载到全局，并且将callback赋值给这个变量
+            // 后台将含有callback的fnName的执行函数返回 要在全局进行调用才可以  含有随机数 在生成函数名时就挂载全局
+            window[fnName] = callback;
+            // var fnName = callback;
+            // http://www.example.com?a=1&b=2&callback=函数名字
+            // data => { a:1,b:2 }
+            var querystring = '';
+            for (var attr in data) {
+                querystring += attr + '=' + data[attr] + '&';
+            }
+            // 创建 script 标签
+            var script = document.createElement('script');
+            script.src = url + '?' + querystring + 'callback=' + fnName;
+            // 当请求完成时
+            script.onload = function () {
+                // 将页面中刚才追加的script标签删掉
+                document.body.removeChild(script)
+            }
+            // 将script 标签追加到页面中发起请求
+            document.body.appendChild(script)
+        }
+
+        var url = 'http://www.demo.you/api.php'
+        var data = {
+            id: 1,
+            name: 'jack'
+        }
+        myJsonp(url, data, function (data) {
+            console.log(data)
+        })
+    </script>
+</body>
+
+</html>
